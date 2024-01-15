@@ -1,5 +1,5 @@
 /**
- * @file HedgeYourBet.java
+ * @file HedgeYourBetUsingFile.java
  * @brief This file contains the HedgeYourBet class.
  * @author Sergei Rogov U231N0051
  * @date 15.01.2024
@@ -13,6 +13,15 @@ import java.awt.event.ItemEvent;
 
 import java.util.ArrayList;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -23,8 +32,10 @@ import javax.swing.JLabel;
  * @class HedgeYourBet
  * @brief Represents the main page of the Hedge Your Bet game application.
  */
-public class HedgeYourBet implements ActionListener {
+public class HedgeYourBetUsingFile implements ActionListener {
 	
+	// File where previous score is stored
+	final private static String STORAGE_FILE = "previous_score.txt";
 	// Array with questions
 	final private static ArrayList<String> QUESTIONS = new ArrayList<String>();
 	// Array with answers
@@ -33,6 +44,8 @@ public class HedgeYourBet implements ActionListener {
 	private int question_index = 0;
 	// total score
 	private int cumulative_score = 0;
+	// score from previous game
+	private String previous_score;
 	
 	// Main frame
 	JFrame frame = new JFrame("Hedge Your Bet");
@@ -57,12 +70,16 @@ public class HedgeYourBet implements ActionListener {
 	JLabel scoreLabel = new JLabel();
 	JLabel complementLabel = new JLabel();
 	
+	// Previous score label
+	JLabel previousScoreLabel = new JLabel();
+	
 	/**
-	 * @method HedgeYourBet
+	 * @method HedgeYourBetUsingFile
      * @brief Constructs a new HedgeYourBet game.
      * 		  Instantiates all system-related objects and GUI.
      */
-	public HedgeYourBet(){
+	public HedgeYourBetUsingFile(){
+
 		initializeQuestionsAndAnswers();
 		initializeGUI();
 	}
@@ -93,10 +110,24 @@ public class HedgeYourBet implements ActionListener {
      */
 	private void initializeGUI() {
 		
+		Path filePath = Paths.get(STORAGE_FILE);
+		if (Files.exists(filePath)) {
+			try (BufferedReader reader = new BufferedReader(new FileReader(STORAGE_FILE))) {
+
+	            String line = reader.readLine();
+	            previous_score = line.trim();
+	            
+	        } catch (IOException e) {
+	            System.err.println("Error reading from the file: " + e.getMessage());
+	        }
+        } else {
+        	previous_score = "0";
+        }
+		
 		// Application will exit after user clicks close button
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		// Add item listeners to checkboxes
+		// Add item listeners to checkBoxes
         checkBox1.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -146,8 +177,12 @@ public class HedgeYourBet implements ActionListener {
 		scoreLabel.setBounds(360, 200, 50, 25);
 		scoreLabel.setVisible(false);
 		
-		complementLabel.setBounds(295, 235, 600, 25);
+		complementLabel.setBounds(295, 235, 200, 25);
 		complementLabel.setVisible(false);
+		
+		previousScoreLabel.setBounds(295, 200, 200, 25);
+		previousScoreLabel.setText("Your last score: " + previous_score);
+		previousScoreLabel.setVisible(true);
     	  
 		// Add components to the frame
         frame.add(titleLabel);
@@ -159,6 +194,7 @@ public class HedgeYourBet implements ActionListener {
         frame.add(resultLabel);
         frame.add(scoreLabel);
         frame.add(complementLabel);
+        frame.add(previousScoreLabel);
         
         checkBoxes.add(checkBox1);
         checkBoxes.add(checkBox2);
@@ -203,6 +239,8 @@ public class HedgeYourBet implements ActionListener {
     private void showScoreInfo() {
     	String message;
     	
+    	previousScoreLabel.setVisible(false);
+    	
     	resultLabel.setVisible(true);
     	
     	scoreLabel.setText(cumulative_score + "");
@@ -220,6 +258,23 @@ public class HedgeYourBet implements ActionListener {
     	complementLabel.setText(message);
     	complementLabel.setVisible(true);
     	
+    }
+    
+    /**
+	 * @method createFileIfNotExists
+     * @brief Function to create a file if it does not exist yet.
+     * @param fileName Name of the file.
+     */
+    private static void createFileIfNotExists(String fileName) {
+        try {
+            File file = new File(fileName);
+            if (file.createNewFile()) {
+                System.out.println("File created: " + file.getName());
+            } 
+        } catch (IOException e) {
+            System.out.println("An error occurred while creating the file.");
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -267,6 +322,20 @@ public class HedgeYourBet implements ActionListener {
 			for (JCheckBox checkBox : checkBoxes) {
 				checkBox.setSelected(false);
 			}
+			
+			// Create the file if it doesn't exist
+	        createFileIfNotExists(STORAGE_FILE);
+	        
+	        // write score to file
+	        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORAGE_FILE))) {
+	        	
+	        	// write a score to a file
+	        	writer.write(cumulative_score + "");
+	        	
+	        } catch (IOException exception) {
+	            // Handle IOException if there is an issue with file I/O
+	        	exception.printStackTrace();
+	        }
 		}
 		
 	}
@@ -277,7 +346,7 @@ public class HedgeYourBet implements ActionListener {
      */
 	public static void main(String[] args) {
 	
-		new HedgeYourBet();
+		new HedgeYourBetUsingFile();
 
 	}
 
