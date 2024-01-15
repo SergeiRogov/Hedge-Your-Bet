@@ -10,14 +10,14 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-
-import java.util.ArrayList;
 import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import java.util.ArrayList;
 
 /**
  * @class HedgeYourBet
@@ -92,9 +92,6 @@ public class HedgeYourBet implements ActionListener {
      * @brief Initializes all necessary GUI elements. GUI setup logic.
      */
 	private void initializeGUI() {
-		
-		// Application will exit after user clicks close button
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// Add item listeners to checkboxes
         checkBox1.addItemListener(new ItemListener() {
@@ -256,7 +253,7 @@ public class HedgeYourBet implements ActionListener {
 			// increment index => proceed to next question
 			question_index++;
 			
-			if (question_index == 5) {
+			if (question_index == QUESTIONS.size()) {
 				// if it is the last question
 				showScoreInfo();
 			} else {

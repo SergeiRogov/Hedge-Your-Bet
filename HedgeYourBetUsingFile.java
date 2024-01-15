@@ -10,9 +10,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-
-import java.util.ArrayList;
 import java.awt.event.ItemListener;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,6 +26,8 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import java.util.ArrayList;
 
 /**
  * @class HedgeYourBet
@@ -123,9 +124,6 @@ public class HedgeYourBetUsingFile implements ActionListener {
         } else {
         	previous_score = "0";
         }
-		
-		// Application will exit after user clicks close button
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		// Add item listeners to checkBoxes
         checkBox1.addItemListener(new ItemListener() {
@@ -311,9 +309,24 @@ public class HedgeYourBetUsingFile implements ActionListener {
 			// increment index => proceed to next question
 			question_index++;
 			
-			if (question_index == 5) {
+			if (question_index == QUESTIONS.size()) {
 				// if it is the last question
 				showScoreInfo();
+				
+				// Create the file if it doesn't exist
+		        createFileIfNotExists(STORAGE_FILE);
+		        
+		        // write score to file
+		        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORAGE_FILE))) {
+		        	
+		        	// write a score to a file
+		        	writer.write(cumulative_score + "");
+		        	
+		        } catch (IOException exception) {
+		            // Handle IOException if there is an issue with file I/O
+		        	exception.printStackTrace();
+		        }
+		        
 			} else {
 				updateQuestionLabel();
 			}
@@ -323,19 +336,6 @@ public class HedgeYourBetUsingFile implements ActionListener {
 				checkBox.setSelected(false);
 			}
 			
-			// Create the file if it doesn't exist
-	        createFileIfNotExists(STORAGE_FILE);
-	        
-	        // write score to file
-	        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORAGE_FILE))) {
-	        	
-	        	// write a score to a file
-	        	writer.write(cumulative_score + "");
-	        	
-	        } catch (IOException exception) {
-	            // Handle IOException if there is an issue with file I/O
-	        	exception.printStackTrace();
-	        }
 		}
 		
 	}
