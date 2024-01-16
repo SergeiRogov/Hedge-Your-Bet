@@ -265,7 +265,6 @@ public class HedgeYourBet implements ActionListener {
 				checkBox.setSelected(false);
 			}
 		}
-		
 	}
 	
 	/**
